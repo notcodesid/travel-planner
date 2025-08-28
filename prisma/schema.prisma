@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -72,4 +71,52 @@ model Verification {
   updatedAt  DateTime?
 
   @@map("verification")
+}
+
+model Trip {
+  id          String   @id @default(cuid())
+  city        String
+  start_date  DateTime
+  end_date    DateTime
+  budget_band String
+  pace        String
+  food_prefs  String[]
+  owner_id    String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  days        TripDay[]
+
+  @@map("trip")
+}
+
+model TripDay {
+  id         String     @id @default(cuid())
+  trip_id    String
+  day_index  Int
+  theme      String
+  trip       Trip       @relation(fields: [trip_id], references: [id], onDelete: Cascade)
+  stops      TripStop[]
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+
+  @@unique([trip_id, day_index])
+  @@map("trip_day")
+}
+
+model TripStop {
+  id            String   @id @default(cuid())
+  day_id        String
+  stop_index    Int
+  title         String
+  address       String?
+  start_time    String?
+  duration_mins Int?
+  est_cost      Float    @default(0)
+  url           String?
+  day           TripDay  @relation(fields: [day_id], references: [id], onDelete: Cascade)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  @@unique([day_id, stop_index])
+  @@map("trip_stop")
 }
