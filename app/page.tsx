@@ -1,10 +1,15 @@
 "use client";
 import { useState } from "react";
-import { Calendar, MapPin, DollarSign, Clock, Utensils } from "lucide-react";
+import { Calendar, MapPin, DollarSign, Clock, User } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/components/auth-provider";
+import { signOut } from "@/lib/auth-client";
+import AuthModal from "@/components/auth-modal";
 
 export default function HomePage() {
   const router = useRouter();
+  const { user, isLoading } = useAuth();
+  const [authModalOpen, setAuthModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     city: "",
     startDate: "",
@@ -13,15 +18,6 @@ export default function HomePage() {
     pace: "",
     foodPrefs: [] as string[],
   });
-
-  const handleFoodPrefChange = (pref: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      foodPrefs: prev.foodPrefs.includes(pref)
-        ? prev.foodPrefs.filter((p) => p !== pref)
-        : [...prev.foodPrefs, pref],
-    }));
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,60 +40,73 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#121212]">
+    <div className="min-h-screen bg-[#121212] text-white">
       {/* Header */}
-      <nav className="bg-[#F7F7F0] dark:bg-[#1E1E1E] h-[60px] sticky top-0 z-50">
-        <div className="max-w-full px-4 md:px-6 h-full flex items-center justify-between">
-          <div className="flex items-center pl-2 md:pl-6">
-            <div className="font-montserrat font-semibold text-black dark:text-white text-lg tracking-[-0.2px] relative">
-              TrailMix
-              <span className="absolute -top-1 -right-2 text-xs font-semibold text-[#CCF83B]">
-                ✈
-              </span>
+      <header className="flex items-center justify-between px-6 py-4">
+        <div className="flex items-center">
+          <h1 className="text-xl font-semibold text-white">
+            TrailMix
+            <span className="ml-1 text-yellow-400">⭐</span>
+          </h1>
+        </div>
+        <nav className="flex items-center gap-4">
+          <button
+            onClick={() => router.push("/my-trips")}
+            className="text-white hover:text-gray-300 transition-colors"
+          >
+            My Trips
+          </button>
+          {user ? (
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 text-white">
+                <User size={16} />
+                <span className="text-sm">{user.name || user.email}</span>
+              </div>
+              <button
+                onClick={() => signOut()}
+                className="text-white hover:text-gray-300 transition-colors text-sm"
+              >
+                Sign Out
+              </button>
             </div>
-          </div>
-          <div className="flex items-center gap-4 pr-2 md:pr-6">
+          ) : (
             <button
-              onClick={() => router.push("/my-trips")}
-              className="font-poppins font-medium text-sm text-black dark:text-white hover:opacity-70"
+              onClick={() => setAuthModalOpen(true)}
+              className="text-white hover:text-gray-300 transition-colors"
             >
-              My Trips
-            </button>
-            <button className="font-poppins font-medium text-sm text-black dark:text-white hover:opacity-70">
               Sign In
             </button>
-          </div>
-        </div>
-      </nav>
+          )}
+        </nav>
+      </header>
 
-      {/* Hero Section */}
-      <section className="bg-white dark:bg-[#121212] pt-14 sm:pt-20 lg:pt-[120px] pb-16">
-        <div className="max-w-[1200px] mx-auto px-4 text-center">
-          <h1 className="font-montserrat font-medium text-black dark:text-white tracking-[-0.5px] text-[42px] leading-[1.15] sm:text-[56px] sm:leading-[1.1] lg:text-[72px] lg:leading-[1.05] mb-6">
+      {/* Main Content */}
+      <main className="flex flex-col items-center justify-center min-h-[calc(100vh-80px)] px-4">
+        {/* Hero Section */}
+        <div className="text-center mb-12 max-w-2xl">
+          <h2 className="text-4xl md:text-5xl font-semibold text-white mb-6">
             Your AI Travel Copilot
-          </h1>
-          <p className="font-poppins text-[18px] text-[#666] dark:text-[#B0B0B0] leading-[1.6] max-w-2xl mx-auto mb-12">
+          </h2>
+          <p className="text-lg text-gray-300 leading-relaxed">
             Enter your destination, dates, and preferences. Get a personalized
             day-by-day itinerary with POIs, maps, and weather insights.
           </p>
         </div>
-      </section>
 
-      {/* Trip Planning Form */}
-      <section className="bg-[#F7F7F0] dark:bg-[#1E1E1E] py-16">
-        <div className="max-w-[800px] mx-auto px-4">
+        {/* Form Card */}
+        <div className="w-full max-w-2xl">
           <form
             onSubmit={handleSubmit}
-            className="bg-white dark:bg-[#121212] rounded-[24px] p-8 md:p-12 shadow-lg"
+            className="bg-[#1A1A1A] rounded-2xl p-8 shadow-xl"
           >
-            <h2 className="font-montserrat font-medium text-[28px] text-black dark:text-white mb-8 text-center">
+            <h3 className="text-2xl font-semibold text-white text-center mb-8">
               Plan Your Perfect Trip
-            </h2>
+            </h3>
 
-            {/* City Input */}
+            {/* Destination Input */}
             <div className="mb-6">
-              <label className="flex items-center gap-2 font-poppins font-medium text-sm text-black dark:text-white mb-3">
-                <MapPin size={16} />
+              <label className="flex items-center gap-2 text-sm font-medium text-white mb-3">
+                <MapPin size={16} className="text-gray-400" />
                 Where are you going?
               </label>
               <input
@@ -107,16 +116,16 @@ export default function HomePage() {
                   setFormData({ ...formData, city: e.target.value })
                 }
                 placeholder="Enter city name..."
-                className="w-full h-12 px-4 border border-[#E5E5E5] dark:border-[#404040] rounded-lg font-poppins text-black dark:text-white bg-white dark:bg-[#1E1E1E] focus:outline-none focus:ring-2 focus:ring-[#CCF83B] focus:border-transparent"
+                className="w-full h-12 px-4 bg-[#2A2A2A] border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
               />
             </div>
 
             {/* Date Range */}
-            <div className="grid md:grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-2 gap-4 mb-6">
               <div>
-                <label className="flex items-center gap-2 font-poppins font-medium text-sm text-black dark:text-white mb-3">
-                  <Calendar size={16} />
+                <label className="flex items-center gap-2 text-sm font-medium text-white mb-3">
+                  <Calendar size={16} className="text-gray-400" />
                   Start Date
                 </label>
                 <input
@@ -125,13 +134,13 @@ export default function HomePage() {
                   onChange={(e) =>
                     setFormData({ ...formData, startDate: e.target.value })
                   }
-                  className="w-full h-12 px-4 border border-[#E5E5E5] dark:border-[#404040] rounded-lg font-poppins text-black dark:text-white bg-white dark:bg-[#1E1E1E] focus:outline-none focus:ring-2 focus:ring-[#CCF83B] focus:border-transparent"
+                  className="w-full h-12 px-4 bg-[#2A2A2A] border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
               </div>
               <div>
-                <label className="flex items-center gap-2 font-poppins font-medium text-sm text-black dark:text-white mb-3">
-                  <Calendar size={16} />
+                <label className="flex items-center gap-2 text-sm font-medium text-white mb-3">
+                  <Calendar size={16} className="text-gray-400" />
                   End Date
                 </label>
                 <input
@@ -140,7 +149,7 @@ export default function HomePage() {
                   onChange={(e) =>
                     setFormData({ ...formData, endDate: e.target.value })
                   }
-                  className="w-full h-12 px-4 border border-[#E5E5E5] dark:border-[#404040] rounded-lg font-poppins text-black dark:text-white bg-white dark:bg-[#1E1E1E] focus:outline-none focus:ring-2 focus:ring-[#CCF83B] focus:border-transparent"
+                  className="w-full h-12 px-4 bg-[#2A2A2A] border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
               </div>
@@ -148,49 +157,49 @@ export default function HomePage() {
 
             {/* Budget Selection */}
             <div className="mb-6">
-              <label className="flex items-center gap-2 font-poppins font-medium text-sm text-black dark:text-white mb-3">
-                <DollarSign size={16} />
-                Budget
+              <label className="flex items-center gap-2 text-sm font-medium text-white mb-3">
+                <DollarSign size={16} className="text-gray-400" />
+                $ Budget
               </label>
               <div className="grid grid-cols-3 gap-3">
-                {["tight", "medium", "comfortable"].map((option) => (
+                {["Tight", "Medium", "Comfortable"].map((option) => (
                   <button
                     key={option}
                     type="button"
                     onClick={() =>
-                      setFormData({ ...formData, budget: option })
+                      setFormData({ ...formData, budget: option.toLowerCase() })
                     }
-                    className={`h-12 rounded-lg font-poppins font-medium text-sm transition-all ${
-                      formData.budget === option
-                        ? "bg-[#CCF83B] text-black"
-                        : "bg-[#F5F5F5] dark:bg-[#2A2A2A] text-black dark:text-white hover:bg-[#E0E0E0] dark:hover:bg-[#3A3A3A]"
+                    className={`h-12 rounded-lg font-medium text-sm transition-all ${
+                      formData.budget === option.toLowerCase()
+                        ? "bg-blue-600 text-white"
+                        : "bg-[#2A2A2A] text-white border border-gray-600 hover:bg-[#3A3A3A]"
                     }`}
                   >
-                    {option.charAt(0).toUpperCase() + option.slice(1)}
+                    {option}
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Pace Selection */}
-            <div className="mb-6">
-              <label className="flex items-center gap-2 font-poppins font-medium text-sm text-black dark:text-white mb-3">
-                <Clock size={16} />
+            <div className="mb-8">
+              <label className="flex items-center gap-2 text-sm font-medium text-white mb-3">
+                <Clock size={16} className="text-gray-400" />
                 Travel Pace
               </label>
               <div className="grid grid-cols-2 gap-3">
-                {["relaxed", "packed"].map((option) => (
+                {["Relaxed", "Packed"].map((option) => (
                   <button
                     key={option}
                     type="button"
-                    onClick={() => setFormData({ ...formData, pace: option })}
-                    className={`h-12 rounded-lg font-poppins font-medium text-sm transition-all ${
-                      formData.pace === option
-                        ? "bg-[#CCF83B] text-black"
-                        : "bg-[#F5F5F5] dark:bg-[#2A2A2A] text-black dark:text-white hover:bg-[#E0E0E0] dark:hover:bg-[#3A3A3A]"
+                    onClick={() => setFormData({ ...formData, pace: option.toLowerCase() })}
+                    className={`h-12 rounded-lg font-medium text-sm transition-all ${
+                      formData.pace === option.toLowerCase()
+                        ? "bg-blue-600 text-white"
+                        : "bg-[#2A2A2A] text-white border border-gray-600 hover:bg-[#3A3A3A]"
                     }`}
                   >
-                    {option.charAt(0).toUpperCase() + option.slice(1)}
+                    {option}
                   </button>
                 ))}
               </div>
@@ -198,40 +207,48 @@ export default function HomePage() {
 
             {/* Food Preferences */}
             <div className="mb-8">
-              <label className="flex items-center gap-2 font-poppins font-medium text-sm text-black dark:text-white mb-3">
-                <Utensils size={16} />
-                Food Preferences (optional)
+              <label className="flex items-center gap-2 text-sm font-medium text-white mb-3">
+                🍽️ Food Preferences (Optional)
               </label>
-              <div className="flex flex-wrap gap-2">
-                {["vegetarian", "vegan", "halal", "local", "anything"].map(
-                  (pref) => (
-                    <button
-                      key={pref}
-                      type="button"
-                      onClick={() => handleFoodPrefChange(pref)}
-                      className={`px-4 py-2 rounded-full font-poppins font-medium text-sm transition-all ${
-                        formData.foodPrefs.includes(pref)
-                          ? "bg-[#CCF83B] text-black"
-                          : "bg-[#F5F5F5] dark:bg-[#2A2A2A] text-black dark:text-white hover:bg-[#E0E0E0] dark:hover:bg-[#3A3A3A]"
-                      }`}
-                    >
-                      {pref.charAt(0).toUpperCase() + pref.slice(1)}
-                    </button>
-                  ),
-                )}
+              <div className="grid grid-cols-2 gap-3">
+                {["Vegetarian", "Vegan", "Halal", "Kosher", "Gluten-free", "Local Cuisine"].map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => {
+                      const newFoodPrefs = formData.foodPrefs.includes(option)
+                        ? formData.foodPrefs.filter(pref => pref !== option)
+                        : [...formData.foodPrefs, option];
+                      setFormData({ ...formData, foodPrefs: newFoodPrefs });
+                    }}
+                    className={`h-12 rounded-lg font-medium text-sm transition-all ${
+                      formData.foodPrefs.includes(option)
+                        ? "bg-blue-600 text-white"
+                        : "bg-[#2A2A2A] text-white border border-gray-600 hover:bg-[#3A3A3A]"
+                    }`}
+                  >
+                    {option}
+                  </button>
+                ))}
               </div>
             </div>
 
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full h-14 bg-[#CCF83B] hover:bg-[#B8E635] text-black font-poppins font-semibold text-lg rounded-lg transition-all duration-200 hover:transform hover:-translate-y-0.5 hover:shadow-lg"
+              className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg rounded-lg transition-all duration-200"
             >
               Generate My Itinerary
             </button>
           </form>
         </div>
-      </section>
+      </main>
+
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+      />
     </div>
   );
 }

@@ -1,15 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
-// import { PrismaClient } from '@prisma/client';
-
-// const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const ownerId = searchParams.get('ownerId');
 
-    // Mock data for now since database is not set up
-    const trips: any[] = [];
+    const trips = await prisma.trip.findMany({
+      where: ownerId ? { owner_id: ownerId } : {},
+      include: {
+        days: {
+          include: {
+            stops: {
+              orderBy: { stop_index: 'asc' }
+            }
+          },
+          orderBy: { day_index: 'asc' }
+        }
+      },
+      orderBy: { created_at: 'desc' }
+    });
 
     return NextResponse.json({
       success: true,
@@ -38,18 +48,27 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Mock trip creation for now
-    const trip = {
-      id: 'mock-trip-id',
-      city,
-      start_date: new Date(startDate),
-      end_date: new Date(endDate),
-      budget_band: budgetBand,
-      pace,
-      food_prefs: foodPrefs || [],
-      owner_id: ownerId,
-      days: []
-    };
+    const trip = await prisma.trip.create({
+      data: {
+        city,
+        start_date: new Date(startDate),
+        end_date: new Date(endDate),
+        budget_band: budgetBand,
+        pace,
+        food_prefs: foodPrefs || [],
+        owner_id: ownerId,
+      },
+      include: {
+        days: {
+          include: {
+            stops: {
+              orderBy: { stop_index: 'asc' }
+            }
+          },
+          orderBy: { day_index: 'asc' }
+        }
+      }
+    });
 
     return NextResponse.json({
       success: true,

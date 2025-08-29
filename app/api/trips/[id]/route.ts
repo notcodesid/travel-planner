@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-// import { PrismaClient } from '@prisma/client';
-
-// const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export async function GET(
   request: NextRequest,
@@ -10,8 +8,26 @@ export async function GET(
   try {
     const { id } = await params;
 
-    // Mock trip data for now
-    const trip = null;
+    if (!id) {
+      return NextResponse.json({
+        success: false,
+        error: 'Trip ID is required'
+      }, { status: 400 });
+    }
+
+    const trip = await prisma.trip.findUnique({
+      where: { id },
+      include: {
+        days: {
+          include: {
+            stops: {
+              orderBy: { stop_index: 'asc' }
+            }
+          },
+          orderBy: { day_index: 'asc' }
+        }
+      }
+    });
 
     if (!trip) {
       return NextResponse.json({
@@ -42,12 +58,31 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
 
-    // Mock trip update for now
-    const trip = { id, ...body };
+    if (!id) {
+      return NextResponse.json({
+        success: false,
+        error: 'Trip ID is required'
+      }, { status: 400 });
+    }
+
+    const updatedTrip = await prisma.trip.update({
+      where: { id },
+      data: body,
+      include: {
+        days: {
+          include: {
+            stops: {
+              orderBy: { stop_index: 'asc' }
+            }
+          },
+          orderBy: { day_index: 'asc' }
+        }
+      }
+    });
 
     return NextResponse.json({
       success: true,
-      trip
+      trip: updatedTrip
     });
 
   } catch (error) {
@@ -66,8 +101,16 @@ export async function DELETE(
   try {
     const { id } = await params;
 
-    // Mock trip deletion for now
-    // await prisma.trip.delete({ where: { id } });
+    if (!id) {
+      return NextResponse.json({
+        success: false,
+        error: 'Trip ID is required'
+      }, { status: 400 });
+    }
+
+    await prisma.trip.delete({
+      where: { id }
+    });
 
     return NextResponse.json({
       success: true,

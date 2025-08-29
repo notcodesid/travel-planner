@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-// import { PrismaClient } from '@prisma/client';
-
-// const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 interface GenerateItineraryRequest {
   city: string;
@@ -35,32 +33,45 @@ export async function POST(request: NextRequest) {
     // Generate mock itinerary (replace with actual AI generation)
     const mockItinerary = generateMockItinerary(city, diffDays, budgetBand, pace);
 
-    // Mock trip creation for now
-    const trip = {
-      id: 'mock-' + Date.now(),
-      city,
-      start_date: start,
-      end_date: end,
-      budget_band: budgetBand,
-      pace,
-      food_prefs: foodPrefs,
-      owner_id: ownerId,
-      days: mockItinerary.days.map((day, index) => ({
-        id: 'day-' + index,
-        day_index: index + 1,
-        theme: day.theme,
-        stops: day.stops.map((stop, stopIndex) => ({
-          id: 'stop-' + stopIndex,
-          title: stop.title,
-          address: stop.address,
-          start_time: stop.start_time,
-          duration_mins: stop.duration_mins,
-          est_cost: stop.est_cost,
-          url: stop.url,
-          stop_index: stopIndex + 1
-        }))
-      }))
-    };
+    // Create trip with days and stops in database
+    const trip = await prisma.trip.create({
+      data: {
+        city,
+        start_date: start,
+        end_date: end,
+        budget_band: budgetBand,
+        pace,
+        food_prefs: foodPrefs,
+        owner_id: ownerId,
+        days: {
+          create: mockItinerary.days.map((day, index) => ({
+            day_index: index + 1,
+            theme: day.theme,
+            stops: {
+              create: day.stops.map((stop, stopIndex) => ({
+                stop_index: stopIndex + 1,
+                title: stop.title,
+                address: stop.address,
+                start_time: stop.start_time,
+                duration_mins: stop.duration_mins,
+                est_cost: stop.est_cost,
+                url: stop.url,
+              }))
+            }
+          }))
+        }
+      },
+      include: {
+        days: {
+          include: {
+            stops: {
+              orderBy: { stop_index: 'asc' }
+            }
+          },
+          orderBy: { day_index: 'asc' }
+        }
+      }
+    });
 
     return NextResponse.json({
       success: true,

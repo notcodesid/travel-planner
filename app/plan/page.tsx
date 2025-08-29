@@ -41,6 +41,7 @@ export default function PlanPage() {
   const [generatedTrip, setGeneratedTrip] = useState<GeneratedTrip | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [weatherData, setWeatherData] = useState<any[]>([]);
 
   useEffect(() => {
     // Get form data from localStorage

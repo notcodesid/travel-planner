@@ -11,6 +11,10 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import TripMap from "@/components/trip-map";
+import ShareModal from "@/components/share-modal";
+import { generateTripPDF } from "@/lib/pdf-export";
+import { useAuth } from "@/components/auth-provider";
 
 interface Stop {
   id: string;
@@ -42,10 +46,14 @@ interface Trip {
 
 export default function TripDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
+  const { user } = useAuth();
   const [trip, setTrip] = useState<Trip | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [id, setId] = useState<string | null>(null);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [weatherData, setWeatherData] = useState<any[]>([]);
+  const [regeneratingDay, setRegeneratingDay] = useState<string | null>(null);
 
   useEffect(() => {
     async function getParams() {
@@ -70,6 +78,8 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
       const result = await response.json();
       if (result.success) {
         setTrip(result.trip);
+        // Fetch weather data
+        fetchWeatherData(result.trip.city, result.trip.start_date, result.trip.end_date);
       } else {
         throw new Error(result.error || "Failed to fetch trip");
       }
@@ -81,26 +91,75 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
     }
   };
 
-  const handleExportPDF = () => {
-    // Placeholder for PDF export functionality
-    alert("PDF export feature coming soon with Pro plan!");
+  const fetchWeatherData = async (city: string, startDate: string, endDate: string) => {
+    try {
+      const response = await fetch(`/api/weather?city=${encodeURIComponent(city)}&startDate=${startDate}&endDate=${endDate}`);
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          setWeatherData(result.data);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch weather data:', err);
+    }
+  };
+
+  const handleExportPDF = async () => {
+    if (!trip) return;
+    
+    try {
+      await generateTripPDF(trip);
+    } catch (err) {
+      console.error('PDF export failed:', err);
+      alert('Failed to generate PDF. Please try again.');
+    }
   };
 
   const handleShareTrip = () => {
-    // Placeholder for sharing functionality
-    const url = window.location.href;
-    navigator.clipboard
-      .writeText(url)
-      .then(() => {
-        alert("Trip link copied to clipboard!");
-      })
-      .catch(() => {
-        alert("Failed to copy link");
-      });
+    setShareModalOpen(true);
   };
 
   const handleRegenerateDay = async (dayId: string, dayIndex: number) => {
-    alert(`Regenerate Day ${dayIndex} coming soon!`);
+    if (!trip) return;
+    
+    setRegeneratingDay(dayId);
+    
+    try {
+      const response = await fetch('/api/regenerate-day', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tripId: trip.id,
+          dayId,
+          dayIndex,
+          city: trip.city,
+          budget: trip.budget_band,
+          pace: trip.pace
+        })
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        // Update the trip with the new day data
+        setTrip(prev => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            days: prev.days.map(day => 
+              day.id === dayId ? result.day : day
+            )
+          };
+        });
+      } else {
+        throw new Error(result.error || 'Failed to regenerate day');
+      }
+    } catch (err) {
+      console.error('Error regenerating day:', err);
+      alert('Failed to regenerate day. Please try again.');
+    } finally {
+      setRegeneratingDay(null);
+    }
   };
 
   const formatTime = (timeString?: string) => {
@@ -280,10 +339,11 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
                   </h3>
                   <button
                     onClick={() => handleRegenerateDay(day.id, day.day_index)}
-                    className="flex items-center gap-1 px-3 py-1 bg-[#F5F5F5] dark:bg-[#2A2A2A] text-black dark:text-white rounded-lg font-poppins text-xs hover:bg-[#E0E0E0] dark:hover:bg-[#3A3A3A]"
+                    disabled={regeneratingDay === day.id}
+                    className="flex items-center gap-1 px-3 py-1 bg-[#F5F5F5] dark:bg-[#2A2A2A] text-black dark:text-white rounded-lg font-poppins text-xs hover:bg-[#E0E0E0] dark:hover:bg-[#3A3A3A] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <RotateCcw size={12} />
-                    Regenerate
+                    <RotateCcw size={12} className={regeneratingDay === day.id ? 'animate-spin' : ''} />
+                    {regeneratingDay === day.id ? 'Regenerating...' : 'Regenerate'}
                   </button>
                 </div>
 
@@ -358,18 +418,16 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
 
           {/* Right Column - Map & Weather */}
           <div className="space-y-6">
-            {/* Map Placeholder */}
+            {/* Interactive Map */}
             <div className="bg-white dark:bg-[#1E1E1E] rounded-[24px] p-6 shadow-lg">
               <h3 className="font-montserrat font-medium text-[18px] text-black dark:text-white mb-4">
                 Map View
               </h3>
-              <div className="bg-[#F5F5F5] dark:bg-[#2A2A2A] rounded-lg h-[300px] flex items-center justify-center">
-                <div className="text-center text-[#666] dark:text-[#B0B0B0] font-poppins">
-                  <MapPin size={24} className="mx-auto mb-2" />
-                  <p>Interactive map with route</p>
-                  <p className="text-sm">Coming soon with Google Maps</p>
-                </div>
-              </div>
+              <TripMap 
+                city={trip.city} 
+                days={trip.days}
+                className="h-[300px] rounded-lg"
+              />
             </div>
 
             {/* Weather Widget */}
@@ -378,22 +436,41 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
                 Weather Forecast
               </h3>
               <div className="space-y-3">
-                {trip.days.slice(0, 3).map((day) => (
-                  <div
-                    key={day.id}
-                    className="flex items-center justify-between p-3 bg-[#F8F9FA] dark:bg-[#2A2A2A] rounded-lg"
-                  >
-                    <span className="font-poppins text-sm text-black dark:text-white">
-                      Day {day.day_index}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl">☀️</span>
-                      <span className="font-poppins text-sm text-[#666] dark:text-[#B0B0B0]">
-                        22°C
+                {weatherData.length > 0 ? (
+                  weatherData.slice(0, Math.min(3, trip.days.length)).map((weather, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 bg-[#F8F9FA] dark:bg-[#2A2A2A] rounded-lg"
+                    >
+                      <span className="font-poppins text-sm text-black dark:text-white">
+                        Day {index + 1}
                       </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl">{weather.icon}</span>
+                        <span className="font-poppins text-sm text-[#666] dark:text-[#B0B0B0]">
+                          {weather.temperature}°C
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  trip.days.slice(0, 3).map((day) => (
+                    <div
+                      key={day.id}
+                      className="flex items-center justify-between p-3 bg-[#F8F9FA] dark:bg-[#2A2A2A] rounded-lg"
+                    >
+                      <span className="font-poppins text-sm text-black dark:text-white">
+                        Day {day.day_index}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl">☀️</span>
+                        <span className="font-poppins text-sm text-[#666] dark:text-[#B0B0B0]">
+                          22°C
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 
@@ -447,6 +524,16 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
           </div>
         </div>
       </div>
+
+      {/* Share Modal */}
+      {trip && (
+        <ShareModal
+          isOpen={shareModalOpen}
+          onClose={() => setShareModalOpen(false)}
+          tripId={trip.id}
+          tripTitle={trip.city}
+        />
+      )}
     </div>
   );
 }

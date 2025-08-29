@@ -83,6 +83,12 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   handler satisfies RouteHandlerConfig<"/api/generate-itinerary">
 }
 
+// Validate ../../app/api/regenerate-day/route.ts
+{
+  const handler = {} as typeof import("../../app/api/regenerate-day/route.js")
+  handler satisfies RouteHandlerConfig<"/api/regenerate-day">
+}
+
 // Validate ../../app/api/trips/[id]/route.ts
 {
   const handler = {} as typeof import("../../app/api/trips/[id]/route.js")
@@ -93,6 +99,12 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   const handler = {} as typeof import("../../app/api/trips/route.js")
   handler satisfies RouteHandlerConfig<"/api/trips">
+}
+
+// Validate ../../app/api/weather/route.ts
+{
+  const handler = {} as typeof import("../../app/api/weather/route.js")
+  handler satisfies RouteHandlerConfig<"/api/weather">
 }
 
 
