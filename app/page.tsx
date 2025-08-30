@@ -41,43 +41,48 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-[#121212] text-white">
+
+
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4">
-        <div className="flex items-center">
+        <div>
           <h1 className="text-xl font-semibold text-white">
             TrailMix
             <span className="ml-1 text-yellow-400">⭐</span>
           </h1>
         </div>
-        <nav className="flex items-center gap-4">
-          <button
-            onClick={() => router.push("/my-trips")}
-            className="text-white hover:text-gray-300 transition-colors"
-          >
-            My Trips
-          </button>
-          {user ? (
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 text-white">
-                <User size={16} />
-                <span className="text-sm">{user.name || user.email}</span>
-              </div>
-              <button
-                onClick={() => signOut()}
-                className="text-white hover:text-gray-300 transition-colors text-sm"
-              >
-                Sign Out
-              </button>
-            </div>
-          ) : (
+
+        <div>
+          <nav className="flex items-center gap-4">
             <button
-              onClick={() => setAuthModalOpen(true)}
+              onClick={() => router.push("/my-trips")}
               className="text-white hover:text-gray-300 transition-colors"
             >
-              Sign In
+              My Trips
             </button>
-          )}
-        </nav>
+            {user ? (
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 text-white">
+                  <User size={16} />
+                  <span className="text-sm">{user.name || user.email}</span>
+                </div>
+                <button
+                  onClick={() => signOut()}
+                  className="text-white hover:text-gray-300 transition-colors text-sm"
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setAuthModalOpen(true)}
+                className="text-white hover:text-gray-300 transition-colors"
+              >
+                Sign In
+              </button>
+            )}
+          </nav>
+        </div>
       </header>
 
       {/* Main Content */}
@@ -169,11 +174,10 @@ export default function HomePage() {
                     onClick={() =>
                       setFormData({ ...formData, budget: option.toLowerCase() })
                     }
-                    className={`h-12 rounded-lg font-medium text-sm transition-all ${
-                      formData.budget === option.toLowerCase()
+                    className={`h-12 rounded-lg font-medium text-sm transition-all ${formData.budget === option.toLowerCase()
                         ? "bg-blue-600 text-white"
                         : "bg-[#2A2A2A] text-white border border-gray-600 hover:bg-[#3A3A3A]"
-                    }`}
+                      }`}
                   >
                     {option}
                   </button>
@@ -193,11 +197,10 @@ export default function HomePage() {
                     key={option}
                     type="button"
                     onClick={() => setFormData({ ...formData, pace: option.toLowerCase() })}
-                    className={`h-12 rounded-lg font-medium text-sm transition-all ${
-                      formData.pace === option.toLowerCase()
+                    className={`h-12 rounded-lg font-medium text-sm transition-all ${formData.pace === option.toLowerCase()
                         ? "bg-blue-600 text-white"
                         : "bg-[#2A2A2A] text-white border border-gray-600 hover:bg-[#3A3A3A]"
-                    }`}
+                      }`}
                   >
                     {option}
                   </button>
@@ -221,11 +224,10 @@ export default function HomePage() {
                         : [...formData.foodPrefs, option];
                       setFormData({ ...formData, foodPrefs: newFoodPrefs });
                     }}
-                    className={`h-12 rounded-lg font-medium text-sm transition-all ${
-                      formData.foodPrefs.includes(option)
+                    className={`h-12 rounded-lg font-medium text-sm transition-all ${formData.foodPrefs.includes(option)
                         ? "bg-blue-600 text-white"
                         : "bg-[#2A2A2A] text-white border border-gray-600 hover:bg-[#3A3A3A]"
-                    }`}
+                      }`}
                   >
                     {option}
                   </button>
@@ -245,7 +247,7 @@ export default function HomePage() {
       </main>
 
       {/* Auth Modal */}
-      <AuthModal 
+      <AuthModal
         isOpen={authModalOpen}
         onClose={() => setAuthModalOpen(false)}
       />
