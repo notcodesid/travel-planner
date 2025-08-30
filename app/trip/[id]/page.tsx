@@ -15,6 +15,7 @@ import TripMap from "@/components/trip-map";
 import ShareModal from "@/components/share-modal";
 import { generateTripPDF } from "@/lib/pdf-export";
 import { useAuth } from "@/components/auth-provider";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 interface Stop {
   id: string;
@@ -258,6 +259,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
             >
               My Trips
             </button>
+            <ThemeToggle />
             <button className="font-poppins font-medium text-sm text-black dark:text-white hover:opacity-70">
               Sign In
             </button>
