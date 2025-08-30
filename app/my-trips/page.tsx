@@ -67,14 +67,14 @@ export default function MyTripsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#121212]">
+    <div className="min-h-screen bg-background-light dark:bg-background-dark">
       {/* Header */}
-      <nav className="bg-[#F7F7F0] dark:bg-[#1E1E1E] h-[60px] sticky top-0 z-50">
+      <nav className="nav-bg h-[60px] sticky top-0 z-50">
         <div className="max-w-full px-4 md:px-6 h-full flex items-center justify-between">
           <div className="flex items-center pl-2 md:pl-6">
             <div className="font-montserrat font-semibold text-black dark:text-white text-lg tracking-[-0.2px] relative">
               TrailMix
-              <span className="absolute -top-1 -right-2 text-xs font-semibold text-[#CCF83B]">
+              <span className="absolute -top-1 -right-2 text-xs font-semibold text-primary">
                 ✈
               </span>
             </div>
@@ -86,7 +86,7 @@ export default function MyTripsPage() {
             >
               Home
             </button>
-            <button className="font-poppins font-medium text-sm text-[#CCF83B] font-semibold">
+            <button className="font-poppins font-medium text-sm text-primary font-semibold">
               My Trips
             </button>
             <button className="font-poppins font-medium text-sm text-black dark:text-white hover:opacity-70">
@@ -110,7 +110,7 @@ export default function MyTripsPage() {
             </div>
             <button 
               onClick={handleCreateTrip}
-              className="flex items-center gap-2 px-6 py-3 bg-[#CCF83B] hover:bg-[#B8E635] text-black rounded-lg font-poppins font-semibold transition-all duration-200 hover:transform hover:-translate-y-0.5 hover:shadow-lg mt-4 md:mt-0"
+              className="btn-primary flex items-center gap-2 hover:transform hover:-translate-y-0.5 hover:shadow-lg mt-4 md:mt-0"
             >
               <Plus size={20} />
               Plan New Trip
@@ -122,13 +122,13 @@ export default function MyTripsPage() {
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#CCF83B] mb-4"></div>
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
               <p className="font-poppins text-[#666] dark:text-[#B0B0B0]">Loading your trips...</p>
             </div>
           </div>
         ) : error ? (
           /* Error State */
-          <div className="bg-white dark:bg-[#1E1E1E] rounded-[24px] p-8 shadow-lg">
+          <div className="card">
             <div className="text-center">
               <h2 className="font-montserrat font-medium text-[24px] text-red-600 mb-2">
                 Error Loading Trips
@@ -138,7 +138,7 @@ export default function MyTripsPage() {
               </p>
               <button 
                 onClick={fetchTrips}
-                className="px-6 py-3 bg-[#CCF83B] hover:bg-[#B8E635] text-black rounded-lg font-poppins font-medium"
+                className="btn-primary"
               >
                 Try Again
               </button>
@@ -147,7 +147,7 @@ export default function MyTripsPage() {
         ) : trips.length === 0 ? (
           /* Empty State */
           <div className="text-center py-20">
-            <div className="bg-white dark:bg-[#1E1E1E] rounded-[24px] p-12 shadow-lg max-w-md mx-auto">
+            <div className="card max-w-md mx-auto">
               <div className="w-16 h-16 bg-[#F0F8FF] dark:bg-[#2A3A4A] rounded-full flex items-center justify-center mx-auto mb-6">
                 <MapPin size={32} className="text-[#0066CC] dark:text-[#66B3FF]" />
               </div>
@@ -159,7 +159,7 @@ export default function MyTripsPage() {
               </p>
               <button 
                 onClick={handleCreateTrip}
-                className="flex items-center gap-2 px-6 py-3 bg-[#CCF83B] hover:bg-[#B8E635] text-black rounded-lg font-poppins font-semibold mx-auto"
+                className="btn-primary flex items-center gap-2 mx-auto"
               >
                 <Plus size={20} />
                 Plan Your First Trip
@@ -173,7 +173,7 @@ export default function MyTripsPage() {
               <div 
                 key={trip.id}
                 onClick={() => handleTripClick(trip.id)}
-                className="bg-white dark:bg-[#1E1E1E] rounded-[24px] p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer hover:transform hover:-translate-y-1"
+                className="card hover:shadow-xl transition-all duration-300 cursor-pointer hover:transform hover:-translate-y-1"
               >
                 {/* Trip Header */}
                 <div className="mb-4">

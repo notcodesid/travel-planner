@@ -178,9 +178,9 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[#121212] flex items-center justify-center">
+      <div className="min-h-screen bg-background-light dark:bg-background-dark flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#CCF83B] mb-4"></div>
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
           <p className="font-poppins text-[#666] dark:text-[#B0B0B0]">
             Loading trip...
           </p>
@@ -191,7 +191,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
 
   if (error) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[#121212] flex items-center justify-center">
+      <div className="min-h-screen bg-background-light dark:bg-background-dark flex items-center justify-center">
         <div className="text-center">
           <h2 className="font-montserrat font-medium text-[24px] text-red-600 mb-2">
             Error Loading Trip
@@ -201,7 +201,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
           </p>
           <button
             onClick={() => id && fetchTrip(id)}
-            className="px-6 py-3 bg-[#CCF83B] hover:bg-[#B8E635] text-black rounded-lg font-poppins font-medium"
+            className="btn-primary"
           >
             Try Again
           </button>
@@ -212,7 +212,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
 
   if (!trip) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[#121212] flex items-center justify-center">
+      <div className="min-h-screen bg-background-light dark:bg-background-dark flex items-center justify-center">
         <div className="text-center">
           <h2 className="font-montserrat font-medium text-[24px] text-black dark:text-white mb-2">
             Trip Not Found
@@ -222,7 +222,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
           </p>
           <button
             onClick={() => router.push("/")}
-            className="px-6 py-3 bg-[#CCF83B] hover:bg-[#B8E635] text-black rounded-lg font-poppins font-medium"
+            className="btn-primary"
           >
             Go Home
           </button>
@@ -232,9 +232,9 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#121212]">
+    <div className="min-h-screen bg-background-light dark:bg-background-dark">
       {/* Header */}
-      <nav className="bg-[#F7F7F0] dark:bg-[#1E1E1E] h-[60px] sticky top-0 z-50">
+      <nav className="nav-bg h-[60px] sticky top-0 z-50">
         <div className="max-w-full px-4 md:px-6 h-full flex items-center justify-between">
           <div className="flex items-center gap-4 pl-2 md:pl-6">
             <button
@@ -246,7 +246,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
             </button>
             <div className="font-montserrat font-semibold text-black dark:text-white text-lg tracking-[-0.2px] relative">
               TrailMix
-              <span className="absolute -top-1 -right-2 text-xs font-semibold text-[#CCF83B]">
+              <span className="absolute -top-1 -right-2 text-xs font-semibold text-primary">
                 ✈
               </span>
             </div>
@@ -267,7 +267,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
 
       <div className="max-w-[1200px] mx-auto px-4 py-8">
         {/* Trip Header */}
-        <div className="bg-white dark:bg-[#1E1E1E] rounded-[24px] p-6 md:p-8 mb-8 shadow-lg">
+        <div className="card p-6 md:p-8 mb-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
             <div>
               <h1 className="font-montserrat font-medium text-[28px] md:text-[36px] text-black dark:text-white mb-2">
@@ -292,14 +292,14 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
             <div className="flex gap-3 mt-4 md:mt-0">
               <button
                 onClick={handleShareTrip}
-                className="flex items-center gap-2 px-4 py-2 bg-[#F5F5F5] dark:bg-[#2A2A2A] text-black dark:text-white rounded-lg font-poppins font-medium text-sm hover:bg-[#E0E0E0] dark:hover:bg-[#3A3A3A]"
+                className="btn-secondary flex items-center gap-2"
               >
                 <Share size={16} />
                 Share
               </button>
               <button
                 onClick={handleExportPDF}
-                className="flex items-center gap-2 px-4 py-2 bg-[#CCF83B] hover:bg-[#B8E635] text-black rounded-lg font-poppins font-medium text-sm"
+                className="btn-primary flex items-center gap-2"
               >
                 <FileDown size={16} />
                 Export PDF
@@ -331,7 +331,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
             {trip.days.map((day, index) => (
               <div
                 key={day.id}
-                className="bg-white dark:bg-[#1E1E1E] rounded-[24px] p-6 shadow-lg"
+                className="card"
               >
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-montserrat font-medium text-[20px] text-black dark:text-white">
@@ -340,7 +340,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
                   <button
                     onClick={() => handleRegenerateDay(day.id, day.day_index)}
                     disabled={regeneratingDay === day.id}
-                    className="flex items-center gap-1 px-3 py-1 bg-[#F5F5F5] dark:bg-[#2A2A2A] text-black dark:text-white rounded-lg font-poppins text-xs hover:bg-[#E0E0E0] dark:hover:bg-[#3A3A3A] disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="btn-secondary flex items-center gap-1 text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <RotateCcw size={12} className={regeneratingDay === day.id ? 'animate-spin' : ''} />
                     {regeneratingDay === day.id ? 'Regenerating...' : 'Regenerate'}
@@ -353,7 +353,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
                       key={stop.id}
                       className="flex items-start gap-4 p-4 bg-[#F8F9FA] dark:bg-[#2A2A2A] rounded-lg"
                     >
-                      <div className="w-2 h-2 bg-[#CCF83B] rounded-full flex-shrink-0 mt-2"></div>
+                      <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></div>
                       <div className="flex-grow">
                         <div className="flex justify-between items-start mb-1">
                           <h4 className="font-poppins font-medium text-black dark:text-white">

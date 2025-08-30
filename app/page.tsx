@@ -40,8 +40,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#121212] text-white">
-
+    <div className="min-h-screen bg-background-dark text-white">
 
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4">
@@ -102,7 +101,7 @@ export default function HomePage() {
         <div className="w-full max-w-2xl">
           <form
             onSubmit={handleSubmit}
-            className="bg-[#1A1A1A] rounded-2xl p-8 shadow-xl"
+            className="bg-surface-dark rounded-2xl p-8 shadow-xl"
           >
             <h3 className="text-2xl font-semibold text-white text-center mb-8">
               Plan Your Perfect Trip
@@ -121,7 +120,7 @@ export default function HomePage() {
                   setFormData({ ...formData, city: e.target.value })
                 }
                 placeholder="Enter city name..."
-                className="w-full h-12 px-4 bg-[#2A2A2A] border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="input-field"
                 required
               />
             </div>
@@ -139,7 +138,7 @@ export default function HomePage() {
                   onChange={(e) =>
                     setFormData({ ...formData, startDate: e.target.value })
                   }
-                  className="w-full h-12 px-4 bg-[#2A2A2A] border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="input-field"
                   required
                 />
               </div>
@@ -154,7 +153,7 @@ export default function HomePage() {
                   onChange={(e) =>
                     setFormData({ ...formData, endDate: e.target.value })
                   }
-                  className="w-full h-12 px-4 bg-[#2A2A2A] border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="input-field"
                   required
                 />
               </div>
@@ -174,10 +173,11 @@ export default function HomePage() {
                     onClick={() =>
                       setFormData({ ...formData, budget: option.toLowerCase() })
                     }
-                    className={`h-12 rounded-lg font-medium text-sm transition-all ${formData.budget === option.toLowerCase()
-                        ? "bg-blue-600 text-white"
-                        : "bg-[#2A2A2A] text-white border border-gray-600 hover:bg-[#3A3A3A]"
-                      }`}
+                    className={`h-12 rounded-lg font-medium text-sm transition-all ${
+                      formData.budget === option.toLowerCase()
+                        ? "bg-primary text-black"
+                        : "btn-secondary"
+                    }`}
                   >
                     {option}
                   </button>
@@ -197,10 +197,11 @@ export default function HomePage() {
                     key={option}
                     type="button"
                     onClick={() => setFormData({ ...formData, pace: option.toLowerCase() })}
-                    className={`h-12 rounded-lg font-medium text-sm transition-all ${formData.pace === option.toLowerCase()
-                        ? "bg-blue-600 text-white"
-                        : "bg-[#2A2A2A] text-white border border-gray-600 hover:bg-[#3A3A3A]"
-                      }`}
+                    className={`h-12 rounded-lg font-medium text-sm transition-all ${
+                      formData.pace === option.toLowerCase()
+                        ? "bg-primary text-black"
+                        : "btn-secondary"
+                    }`}
                   >
                     {option}
                   </button>
@@ -224,10 +225,11 @@ export default function HomePage() {
                         : [...formData.foodPrefs, option];
                       setFormData({ ...formData, foodPrefs: newFoodPrefs });
                     }}
-                    className={`h-12 rounded-lg font-medium text-sm transition-all ${formData.foodPrefs.includes(option)
-                        ? "bg-blue-600 text-white"
-                        : "bg-[#2A2A2A] text-white border border-gray-600 hover:bg-[#3A3A3A]"
-                      }`}
+                    className={`h-12 rounded-lg font-medium text-sm transition-all ${
+                      formData.foodPrefs.includes(option)
+                        ? "bg-primary text-black"
+                        : "btn-secondary"
+                    }`}
                   >
                     {option}
                   </button>
@@ -238,7 +240,7 @@ export default function HomePage() {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg rounded-lg transition-all duration-200"
+              className="btn-primary w-full h-14 text-lg"
             >
               Generate My Itinerary
             </button>

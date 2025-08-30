@@ -120,9 +120,9 @@ export default function PlanPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#121212]">
+    <div className="min-h-screen bg-background-light dark:bg-background-dark">
       {/* Header */}
-      <nav className="bg-[#F7F7F0] dark:bg-[#1E1E1E] h-[60px] sticky top-0 z-50">
+      <nav className="nav-bg h-[60px] sticky top-0 z-50">
         <div className="max-w-full px-4 md:px-6 h-full flex items-center justify-between">
           <div className="flex items-center gap-4 pl-2 md:pl-6">
             <button
@@ -134,7 +134,7 @@ export default function PlanPage() {
             </button>
             <div className="font-montserrat font-semibold text-black dark:text-white text-lg tracking-[-0.2px] relative">
               TrailMix
-              <span className="absolute -top-1 -right-2 text-xs font-semibold text-[#CCF83B]">
+              <span className="absolute -top-1 -right-2 text-xs font-semibold text-primary">
                 ✈
               </span>
             </div>
@@ -155,7 +155,7 @@ export default function PlanPage() {
 
       <div className="max-w-[1200px] mx-auto px-4 py-8">
         {/* Trip Header */}
-        <div className="bg-white dark:bg-[#1E1E1E] rounded-[24px] p-6 md:p-8 mb-8 shadow-lg">
+        <div className="card p-6 md:p-8 mb-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
             <div>
               <h1 className="font-montserrat font-medium text-[28px] md:text-[36px] text-black dark:text-white mb-2">
@@ -179,13 +179,13 @@ export default function PlanPage() {
             <div className="flex gap-3 mt-4 md:mt-0">
               <button 
                 onClick={handleSaveTrip}
-                className="px-4 py-2 bg-[#F5F5F5] dark:bg-[#2A2A2A] text-black dark:text-white rounded-lg font-poppins font-medium text-sm hover:bg-[#E0E0E0] dark:hover:bg-[#3A3A3A]"
+                className="btn-secondary"
               >
                 Save Trip
               </button>
               <button 
                 onClick={handleExportPDF}
-                className="px-4 py-2 bg-[#CCF83B] hover:bg-[#B8E635] text-black rounded-lg font-poppins font-medium text-sm"
+                className="btn-primary"
               >
                 Export PDF
               </button>
