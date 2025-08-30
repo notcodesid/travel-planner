@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   MapPin,
   Calendar,
@@ -55,16 +55,21 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
   const [weatherData, setWeatherData] = useState<any[]>([]);
   const [regeneratingDay, setRegeneratingDay] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function getParams() {
-      const resolvedParams = await params;
-      setId(resolvedParams.id);
-      fetchTrip(resolvedParams.id);
+  const fetchWeatherData = useCallback(async (city: string, startDate: string, endDate: string) => {
+    try {
+      const response = await fetch(`/api/weather?city=${encodeURIComponent(city)}&startDate=${startDate}&endDate=${endDate}`);
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          setWeatherData(result.data);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch weather data:', err);
     }
-    getParams();
-  }, [params]);
+  }, []);
 
-  const fetchTrip = async (tripId: string) => {
+  const fetchTrip = useCallback(async (tripId: string) => {
     try {
       setLoading(true);
       setError(null);
@@ -89,21 +94,16 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
     } finally {
       setLoading(false);
     }
-  };
+  }, [fetchWeatherData]);
 
-  const fetchWeatherData = async (city: string, startDate: string, endDate: string) => {
-    try {
-      const response = await fetch(`/api/weather?city=${encodeURIComponent(city)}&startDate=${startDate}&endDate=${endDate}`);
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success && result.data) {
-          setWeatherData(result.data);
-        }
-      }
-    } catch (err) {
-      console.error('Failed to fetch weather data:', err);
+  useEffect(() => {
+    async function getParams() {
+      const resolvedParams = await params;
+      setId(resolvedParams.id);
+      fetchTrip(resolvedParams.id);
     }
-  };
+    getParams();
+  }, [params, fetchTrip]);
 
   const handleExportPDF = async () => {
     if (!trip) return;

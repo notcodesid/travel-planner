@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { MapPin, Calendar, Clock, DollarSign, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -43,20 +43,7 @@ export default function PlanPage() {
   const [error, setError] = useState<string | null>(null);
   const [weatherData, setWeatherData] = useState<any[]>([]);
 
-  useEffect(() => {
-    // Get form data from localStorage
-    const formData = localStorage.getItem("tripFormData");
-    if (formData) {
-      const data = JSON.parse(formData);
-      setTripData(data);
-      generateItinerary(data);
-    } else {
-      // Redirect back to home if no data
-      router.push("/");
-    }
-  }, [router]);
-
-  const generateItinerary = async (data: TripData) => {
+  const generateItinerary = useCallback(async (data: TripData) => {
     try {
       setLoading(true);
       setError(null);
@@ -97,7 +84,20 @@ export default function PlanPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    // Get form data from localStorage
+    const formData = localStorage.getItem("tripFormData");
+    if (formData) {
+      const data = JSON.parse(formData);
+      setTripData(data);
+      generateItinerary(data);
+    } else {
+      // Redirect back to home if no data
+      router.push("/");
+    }
+  }, [router, generateItinerary]);
 
   const handleSaveTrip = async () => {
     if (!generatedTrip) return;

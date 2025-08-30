@@ -93,7 +93,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             Secure authentication powered by Google
           </p>
           <p className="text-[#666] dark:text-[#B0B0B0] text-xs font-poppins mt-1">
-            We'll never share your data or send spam
+            We&apos;ll never share your data or send spam
           </p>
         </div>
       </div>
